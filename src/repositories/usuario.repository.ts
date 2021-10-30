@@ -6,11 +6,11 @@ import {RolRepository} from './rol.repository';
 
 export class UsuarioRepository extends DefaultCrudRepository<
   Usuario,
-  typeof Usuario.prototype.id,
+  typeof Usuario.prototype._id,
   UsuarioRelations
 > {
 
-  public readonly tiene: BelongsToAccessor<Rol, typeof Usuario.prototype.id>;
+  public readonly tiene: BelongsToAccessor<Rol, typeof Usuario.prototype._id>;
 
   constructor(
     @inject('datasources.mongodb') dataSource: MongodbDataSource, @repository.getter('RolRepository') protected rolRepositoryGetter: Getter<RolRepository>,

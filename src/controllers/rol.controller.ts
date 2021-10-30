@@ -37,12 +37,12 @@ export class RolController {
         'application/json': {
           schema: getModelSchemaRef(Rol, {
             title: 'NewRol',
-            exclude: ['id'],
+            exclude: ['_id'],
           }),
         },
       },
     })
-    rol: Omit<Rol, 'id'>,
+    rol: Omit<Rol, '_id'>,
   ): Promise<Rol> {
     return this.rolRepository.create(rol);
   }
@@ -105,7 +105,7 @@ export class RolController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(Rol, {exclude: 'where'}) filter?: FilterExcludingWhere<Rol>
   ): Promise<Rol> {
     return this.rolRepository.findById(id, filter);
@@ -116,7 +116,7 @@ export class RolController {
     description: 'Rol PATCH success',
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +134,7 @@ export class RolController {
     description: 'Rol PUT success',
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() rol: Rol,
   ): Promise<void> {
     await this.rolRepository.replaceById(id, rol);
@@ -144,7 +144,7 @@ export class RolController {
   @response(204, {
     description: 'Rol DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.rolRepository.deleteById(id);
   }
 }
