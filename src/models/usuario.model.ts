@@ -22,6 +22,13 @@ export class Usuario extends Entity {
   })
   correo: string;
 
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  clave: string;
+
   @property({
     type: 'string',
     required: true,
