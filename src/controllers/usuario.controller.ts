@@ -12,15 +12,17 @@ import {
   getModelSchemaRef, param, patch, post, put, requestBody,
   response
 } from '@loopback/rest';
-import {Credenciales, CredencialesCambioClave, CredencialesRecuperarClave, Usuario} from '../models';
+import {Credenciales, CredencialesCambioClave, CredencialesRecuperarClave, NotificacionCorreo, Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
-import {AdministradorDeClavesService} from '../services';
+import {AdministradorDeClavesService, NotificacionesService} from '../services';
 export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
     public usuarioRepository: UsuarioRepository,
     @service(AdministradorDeClavesService)
-    public servicioClaves: AdministradorDeClavesService
+    public servicioClaves: AdministradorDeClavesService,
+    @service(NotificacionesService)
+    public servicioNotificaciones: NotificacionesService
   ) { }
 
   @post('/usuarios')
@@ -42,8 +44,13 @@ export class UsuarioController {
     usuario: Omit<Usuario, '_id'>,
   ): Promise<Usuario> {
     let clave = this.servicioClaves.GenerarClaveAleatoria();
-    console.log(clave)
+    console.log(clave);
     //EN ESTE PUNTO SE NECESITA NOTIFICAR AL USUARIO POR MEDIO DE UN CORREO CUAL ES SU CLAVE NORMAL, ANTES DE CIFRARLA
+    let notificacion = new NotificacionCorreo();
+    notificacion.destinatario = usuario.correo;
+    notificacion.asunto = "Registro en el sistema";
+    notificacion.mensaje = `Hola ${usuario.nombre}<br /> Su clave de acceso al sistema es: ${clave} y su usuario es el correo electronico`
+    this.servicioNotificaciones.EnviarCorreo(notificacion)
     //LA CLAVE CIFRADA ES PARA LA BASE DE DATOS, (como se descifra ? :P)
     let claveCifrada = this.servicioClaves.CifrarTexto(clave)
     console.log(claveCifrada)
@@ -224,6 +231,11 @@ export class UsuarioController {
         console.log(datos.nueva_clave);
         await this.usuarioRepository.updateById(datos.id, usuario)
         //ENVIAR UN CORREO AL USUARIO NOTIFICANDO EL CAMBIO DE CONTRASEÑA
+        let notificacion = new NotificacionCorreo();
+        notificacion.destinatario = usuario.correo;
+        notificacion.asunto = "Cambio de clave";
+        notificacion.mensaje = `Hola ${usuario.nombre}<br /> Su contraseña en el sistema ha sido modificada exitosamente`
+        this.servicioNotificaciones.EnviarCorreo(notificacion)
         return true;
       } else {
         return false;
