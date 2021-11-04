@@ -28,7 +28,7 @@ export class App extends BootMixin(
     this.configure(RestExplorerBindings.COMPONENT).to({
       path: '/explorer',
     });
-    this.component(RestExplorerComponent);
+
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here

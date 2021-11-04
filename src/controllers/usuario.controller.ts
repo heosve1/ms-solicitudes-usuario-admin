@@ -15,6 +15,7 @@ import {
 import {Credenciales, CredencialesCambioClave, CredencialesRecuperarClave, NotificacionCorreo, Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
 import {AdministradorDeClavesService, NotificacionesService} from '../services';
+import {SesionUsuariosService} from '../services/sesion-usuarios.service';
 export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
@@ -22,7 +23,9 @@ export class UsuarioController {
     @service(AdministradorDeClavesService)
     public servicioClaves: AdministradorDeClavesService,
     @service(NotificacionesService)
-    public servicioNotificaciones: NotificacionesService
+    public servicioNotificaciones: NotificacionesService,
+    @service(SesionUsuariosService)
+    public servicioSesionUsuario: SesionUsuariosService
   ) { }
 
   @post('/usuarios')
@@ -163,27 +166,24 @@ export class UsuarioController {
   @post("/identificar-usuario", {
     responses: {
       '200': {
-        description: "Identificacion de usuarios"
+        description: "Identificación de usuarios"
       }
     }
   })
   async identificar(
     @requestBody() credenciales: Credenciales
-  ): Promise<Usuario | null> {
-    let usuario = await this.usuarioRepository.findOne({
-      where: {
-        correo: credenciales.usuario,
-        clave: credenciales.clave
-      }
-    });
+  ): Promise<object> {
+    let usuario = await this.servicioSesionUsuario.ValidarCredenciales(credenciales);
+    let token = "";
     if (usuario) {
       usuario.clave = "";
-      //CONSUMIR EL MICROSERVICIO DE TOKENS Y GENERAR UNO NUEVO
-      //SE ASIGNARA ESE TOKEN A LA RESPUESTA DEL CLIENTE
+      token = await this.servicioSesionUsuario.CrearToken(usuario);
     }
-    return usuario;
+    return {
+      tk: token,
+      usuario: usuario
+    };
   }
-
 
   @post("/recuperar-clave", {
     responses: {

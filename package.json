@@ -58,7 +58,7 @@
     "@types/node-fetch": "^3.0.3",
     "crypto-js": "^4.1.1",
     "loopback-connector-mongodb": "^5.6.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.6",
     "password-generator": "^2.3.2",
     "tslib": "^2.0.0"
   },
