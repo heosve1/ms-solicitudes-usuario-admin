@@ -209,6 +209,11 @@ export class UsuarioController {
       await this.usuarioRepository.updateById(usuario._id, usuario);
       //CONSUMIR EL MS DE NOTIFICACIONES
       //ENVIAR LA NUEVA CLAVE POR SMS
+      let notificacion = new NotificacionCorreo();
+      notificacion.destinatario = usuario.correo;
+      notificacion.asunto = "Registro en el sistema";
+      notificacion.mensaje = `Hola ${usuario.nombre}<br /> su  nueva clave de acceso al sistema es: ${clave}`
+      this.servicioNotificaciones.EnviarCorreo(notificacion)
       return true;
     }
     return false;
